@@ -22,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased ${inter.className}`}>
+        <div className="absolute top-0 left-0 h-screen w-screen image-bg -z-10" />
         {children}
       </body>
     </html>
