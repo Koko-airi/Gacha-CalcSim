@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Calculator, ToolCase } from "lucide-react";
-import { figtree } from "./layout";
+import { figtree } from "@/lib/fonts";
 
 export default function HomePage() {
   return (

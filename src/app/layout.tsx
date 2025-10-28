@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Figtree, Nunito } from "next/font/google";
+import { Nunito } from "next/font/google";
 
 const inter = Nunito({ subsets: ["latin"], weight: ["400", "500"] });
-export const figtree = Figtree({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: "Gacha CalcSim",
