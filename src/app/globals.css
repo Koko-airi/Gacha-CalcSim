@@ -131,3 +131,15 @@
   filter: blur(2px) brightness(0.25);
   scale: 1.05;
 }
+
+/* Animations */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.6s ease-out;
+}

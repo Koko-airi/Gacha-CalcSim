@@ -13,7 +13,7 @@ import { figtree } from "@/lib/fonts";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 fade-in">
       <div className="w-full max-w-2xl space-y-8">
         <div className="text-center space-y-3">
           <h1
