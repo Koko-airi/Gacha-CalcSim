@@ -32,30 +32,42 @@ export default function CalculatorPage() {
     string,
     string | number
   > | null>(null);
+  const [rates, setRates] = useState<Record<string, string | number>[]>([]);
+  const [offset, setOffset] = useState(0);
 
+  // Recalculate rates when pull plan changes
   useEffect(() => {
-    // Calculate pull results based on the current pull plan state
     const slot1 = pullPlanState[0][0];
     const target = slot1.target;
     const current = slot1.current;
-    const offset = current === "None" ? 0 : Number(current.slice(1)) + 1; // Accounts for the starting constellation
+    const calculatedOffset =
+      current === "None" ? 0 : Number(current.slice(1)) + 1;
 
-    const rates = getExactFeaturedRates(Number(target.slice(1)) + 1 - offset);
-    const chartResults = parseRatesForGraph(rates, offset);
+    setOffset(calculatedOffset);
+
+    const calculatedRates = getExactFeaturedRates(
+      Number(target.slice(1)) + 1 - calculatedOffset
+    );
+    setRates(calculatedRates);
+
+    const chartResults = parseRatesForGraph(calculatedRates, calculatedOffset);
     setChartData(chartResults);
+
+    const tableResults = findProbabilityForPullCount(
+      calculatedRates,
+      numPulls,
+      calculatedOffset
+    );
+    setTableData(tableResults);
   }, [pullPlanState[0]]);
 
+  // Update table data when numPulls changes
   useEffect(() => {
-    // Update table data when numPulls changes
-    const slot1 = pullPlanState[0][0];
-    const target = slot1.target;
-    const current = slot1.current;
-    const offset = current === "None" ? 0 : Number(current.slice(1)) + 1; // Accounts for the starting constellation
-
-    const rates = getExactFeaturedRates(Number(target.slice(1)) + 1 - offset);
-    const tableResults = findProbabilityForPullCount(rates, numPulls, offset);
-    setTableData(tableResults);
-  }, [numPulls, pullPlanState[0]]);
+    if (rates.length > 0) {
+      const tableResults = findProbabilityForPullCount(rates, numPulls, offset);
+      setTableData(tableResults);
+    }
+  }, [numPulls, rates, offset]);
 
   return (
     <div className="min-h-screen p-4 py-8 md:p-8 fade-in">
