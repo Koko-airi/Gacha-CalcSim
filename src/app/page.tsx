@@ -34,7 +34,7 @@ export default function HomePage() {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a game..." />
               </SelectTrigger>
-              <SelectContent className="p-1.5">
+              <SelectContent>
                 <SelectItem value="one">Genshin Impact</SelectItem>
                 <SelectItem value="two">Honkai Star Rail</SelectItem>
                 <SelectItem value="three">Zenless Zone Zero</SelectItem>
