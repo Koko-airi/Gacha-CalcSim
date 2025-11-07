@@ -40,13 +40,16 @@ export default function CalculatorPage() {
     const slot1 = pullPlanState[0][0];
     const target = slot1.target;
     const current = slot1.current;
-    const calculatedOffset =
+    let calculatedOffset =
       current === "None" ? 0 : Number(current.slice(1)) + 1;
 
     setOffset(calculatedOffset);
 
+    if (slot1.type === "Weapon" && slot1.current === "None") calculatedOffset++; // Weapon constellations start at r1
+
     const calculatedRates = getExactFeaturedRates(
-      Number(target.slice(1)) + 1 - calculatedOffset
+      Number(target.slice(1)) + 1 - calculatedOffset,
+      slot1.type
     );
     setRates(calculatedRates);
 

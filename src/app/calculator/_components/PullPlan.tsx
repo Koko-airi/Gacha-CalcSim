@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -129,31 +128,8 @@ export default function PullPlan({
               </SelectTrigger>
               <SelectContent>
                 {slot.type === "Character"
-                  ? CHAR_TARGETS.map(option => {
-                      // Only render options higher than current
-                      if (
-                        slot.current === "None" ||
-                        Number(slot.current.slice(1)) < Number(option.slice(1))
-                      ) {
-                        return (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        );
-                      }
-                      // else if (
-                      //   Number(slot.current.slice(1)) >= Number(slot.target.slice(1))
-                      // )
-                      //   updateSlotTarget(
-                      //     slot.id,
-                      //     `c${Number(slot.current.slice(1)) + 1}`
-                      //   );
-                    })
-                  : WEAPON_TARGETS.map(option => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
+                  ? CHAR_TARGETS.map(selectTargetItem(slot.current))
+                  : WEAPON_TARGETS.map(selectTargetItem(slot.current))}
               </SelectContent>
             </Select>
 
@@ -194,3 +170,22 @@ export default function PullPlan({
     </div>
   );
 }
+
+const selectTargetItem =
+  (current: PullSlot["current"]) =>
+  (option: CharacterTarget | WeaponTarget) => {
+    // Currying, so it can be used in .map() function
+    // Only render options higher than current
+    if (
+      current === "None" ||
+      Number(current.slice(1)) < Number(option.slice(1))
+    ) {
+      return (
+        <SelectItem key={option} value={option}>
+          {option}
+        </SelectItem>
+      );
+    }
+
+    return null;
+  };

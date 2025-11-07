@@ -40,6 +40,30 @@ const chartConfig = {
     label: "c6",
     color: "#f43f5e",
   },
+  r1: {
+    label: "r1",
+    color: "#10a0ff",
+  },
+  r2: {
+    label: "r2",
+    color: "#ff83dd",
+  },
+  r3: {
+    label: "r3",
+    color: "#ffaf20",
+  },
+  r4: {
+    label: "r4",
+    color: "#ff4b4b",
+  },
+  r5: {
+    label: "r5",
+    color: "#9b6cf6",
+  },
+  r6: {
+    label: "r6",
+    color: "#f44f6f",
+  },
 } satisfies ChartConfig;
 
 export default function PullChart({

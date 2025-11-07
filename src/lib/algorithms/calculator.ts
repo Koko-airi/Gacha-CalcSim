@@ -40,7 +40,8 @@ function create3DArray(d1: number, d2: number, d3: number): number[][][] {
  * @returns An array of objects with pulls and constellation probabilities (c0, c1, etc.)
  */
 export function getExactFeaturedRates(
-  maxN: number
+  maxN: number,
+  rewardType: SlotType
 ): Array<Record<string, string | number>> {
   if (maxN < 1 || maxN > 7) {
     throw new Error("maxN must be between 1 and 7 inclusive");
@@ -139,12 +140,12 @@ export function getExactFeaturedRates(
 
     // Add c0 through c(maxN-2) with exact probabilities for N=1 through N=maxN-1, as a percentage
     for (let n = 1; n < maxN; n++) {
-      const cKey = `c${n - 1}`;
+      const cKey = `${rewardType === "Character" ? "c" : "r"}${n - 1}`;
       entry[cKey] = results[i][n] * 100;
     }
 
     // Add the last constellation with N >= maxN, as a percentage
-    const lastCKey = `c${maxN - 1}`;
+    const lastCKey = `${rewardType === "Character" ? "c" : "r"}${maxN - 1}`;
     let probNPlus = 0;
     for (let n = maxN; n <= maxN; n++) {
       probNPlus += results[i][n];
@@ -175,7 +176,7 @@ export function parseRatesForGraph(
 
     // Find all constellation keys and sort them in descending order
     const constellationKeys = Object.keys(entry)
-      .filter(key => key.startsWith("c"))
+      .filter(key => key.startsWith("c") || key.startsWith("r"))
       .sort((a, b) => Number(b.slice(1)) - Number(a.slice(1)));
 
     // Calculate cumulative sums from highest to lowest
@@ -185,7 +186,7 @@ export function parseRatesForGraph(
 
       // Apply offset to the key
       const keyNumber = Number(key.slice(1));
-      const newKey = `c${keyNumber + offset}`;
+      const newKey = `${key.charAt(0)}${keyNumber + offset}`;
       result[newKey] = cumulativeSum;
     }
 
@@ -201,9 +202,10 @@ function convertEntryToPercentages(
 
   // Apply offset to constellation keys
   for (const [key, value] of Object.entries(entry)) {
-    if (key !== "pulls" && key.startsWith("c")) {
+    const firstChar = key.charAt(0);
+    if (key !== "pulls" && (firstChar === "c" || firstChar === "r")) {
       const keyNumber = Number(key.slice(1));
-      const newKey = `c${keyNumber + offset}`;
+      const newKey = `${firstChar}${keyNumber + offset}`;
       newEntry[newKey] = value;
     }
   }
