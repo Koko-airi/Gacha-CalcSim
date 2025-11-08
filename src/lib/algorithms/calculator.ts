@@ -86,8 +86,11 @@ export function getExactFeaturedRates(
         const nextPity = pity + 1;
         let pullRate;
 
-        // Replace 0 with 2 * k later
-        if (pullString.charAt(0) === "C") pullRate = pityRatePerPull[nextPity];
+        // Determine which type of item we're pulling for based on current k value
+        // pullString[k] tells us the type of the (k+1)th copy we're trying to get
+        const currentPullType =
+          k < pullString.length ? pullString.charAt(k) : pullString.charAt(0);
+        if (currentPullType === "C") pullRate = pityRatePerPull[nextPity];
         else pullRate = weaponPityRatePerPull[nextPity];
         const noPullRate = 1.0 - pullRate;
 

@@ -68,17 +68,36 @@ const chartConfig = {
 
 export default function PullChart({
   chartData,
+  milestoneLabels,
 }: {
   chartData: Record<string, string | number>[];
+  milestoneLabels?: Record<string, string>;
 }) {
-  // TODO: replace later with actual data based on user input
-  // .slice(0, pulls);
+  // Build dynamic chart config based on available data keys
+  const dynamicChartConfig: ChartConfig = {};
+
+  if (chartData && chartData.length > 0) {
+    const dataKeys = Object.keys(chartData[0]).filter(key => key !== "pulls");
+
+    dataKeys.forEach((key, index) => {
+      // Use the base chartConfig color if it exists, otherwise use a fallback
+      const baseConfig = chartConfig[key as keyof typeof chartConfig];
+      const label = milestoneLabels?.[key] || key;
+
+      dynamicChartConfig[key] = {
+        label: label,
+        color:
+          baseConfig?.color ||
+          `hsl(${(index * 360) / dataKeys.length}, 70%, 50%)`,
+      };
+    });
+  }
 
   return (
     <Card className="p-6 shadow-xl border-2">
       <div className="h-[400px] w-full">
         {chartData && chartData.length > 0 ? (
-          <ChartContainer config={chartConfig} className="h-full w-full">
+          <ChartContainer config={dynamicChartConfig} className="h-full w-full">
             <AreaChart data={chartData}>
               <CartesianGrid className="stroke-muted" />
               <XAxis
@@ -103,13 +122,14 @@ export default function PullChart({
               />
               {Object.keys(chartData[0]).map(key => {
                 if (key === "pulls") return null;
+                const config = dynamicChartConfig[key];
                 return (
                   <Area
                     key={key}
                     dataKey={key}
-                    fill={chartConfig[key as keyof typeof chartConfig].color}
-                    stroke={chartConfig[key as keyof typeof chartConfig].color}
-                    fillOpacity={0.1}
+                    fill={config.color}
+                    stroke={config.color}
+                    fillOpacity={0.06}
                     strokeWidth={4}
                     dot={false}
                   />

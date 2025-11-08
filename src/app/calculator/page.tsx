@@ -34,22 +34,85 @@ export default function CalculatorPage() {
   > | null>(null);
   const [rates, setRates] = useState<Record<string, string | number>[]>([]);
   const [offset, setOffset] = useState(0);
+  const [milestoneLabels, setMilestoneLabels] = useState<
+    Record<string, string>
+  >({});
 
   // Recalculate rates when pull plan changes
   useEffect(() => {
-    const slot1 = pullPlanState[0][0];
-    const target = slot1.target;
-    const current = slot1.current;
+    const slots = pullPlanState[0];
+
+    // Build pull string and calculate total copies needed
+    let pullString = "";
+    let totalCopiesNeeded = 0;
+    const labelMap: Record<string, string> = {};
+
+    // Get the first slot to determine base offset for display
+    const firstSlot = slots[0];
+    const firstCurrent = firstSlot.current;
+    const firstPrefix = firstSlot.type === "Character" ? "c" : "r";
     let calculatedOffset =
-      current === "None" ? 0 : Number(current.slice(1)) + 1;
+      firstCurrent === "None" ? 0 : Number(firstCurrent.slice(1)) + 1;
+
+    if (firstSlot.type === "Weapon" && firstSlot.current === "None") {
+      calculatedOffset = 1;
+    }
+
+    let milestoneIndex = 0; // Track which copy/milestone we're on
+
+    for (const slot of slots) {
+      const current = slot.current;
+      const target = slot.target;
+
+      // Calculate how many copies needed for this slot
+      let currentLevel = current === "None" ? 0 : Number(current.slice(1)) + 1;
+      let targetLevel = Number(target.slice(1)) + 1;
+
+      // Weapons start at r1, not r0
+      if (slot.type === "Weapon" && current === "None") {
+        currentLevel = 1;
+      }
+
+      const copiesForThisSlot = targetLevel - currentLevel;
+
+      // Generate labels for each milestone
+      for (let i = 0; i < copiesForThisSlot; i++) {
+        const milestoneLevel = currentLevel + i;
+        const prefix = slot.type === "Character" ? "c" : "r";
+
+        // The key in the chart data uses the FIRST slot's prefix, but offset by milestoneIndex
+        // This matches how parseRatesForGraph and the algorithm output their keys
+        const chartKey = `${firstPrefix}${calculatedOffset + milestoneIndex}`;
+        const label = `Reward ${
+          slots.indexOf(slot) + 1
+        }: ${prefix}${milestoneLevel}`;
+
+        labelMap[chartKey] = label;
+        milestoneIndex++;
+      }
+
+      totalCopiesNeeded += copiesForThisSlot;
+
+      // Add to pull string (e.g., "C" or "W" repeated for each copy)
+      pullString += slot.type.charAt(0).repeat(copiesForThisSlot);
+    }
+
+    setMilestoneLabels(labelMap);
+
+    // If no copies needed, set empty data
+    if (totalCopiesNeeded === 0) {
+      setRates([]);
+      setChartData([]);
+      setTableData(null);
+      setOffset(0);
+      return;
+    }
 
     setOffset(calculatedOffset);
 
-    if (slot1.type === "Weapon" && slot1.current === "None") calculatedOffset++; // Weapon constellations start at r1
-
     const calculatedRates = getExactFeaturedRates(
-      Number(target.slice(1)) + 1 - calculatedOffset,
-      slot1.type.charAt(0)
+      totalCopiesNeeded,
+      pullString
     );
     setRates(calculatedRates);
 
@@ -116,14 +179,16 @@ export default function CalculatorPage() {
                   {numPulls && tableData
                     ? (
                         tableData[
-                          Object.keys(tableData).at(-2) as string
+                          Object.keys(tableData)
+                            .filter(k => k !== "None")
+                            .at(-1) as string
                         ] as number
-                      ) // Highest constellation
+                      ) // Highest milestone (excluding "None")
                         .toFixed(2)
                     : "--"}
                   %
                 </span>{" "}
-                chance of obtaining rewards in{" "}
+                chance of obtaining all rewards in{" "}
                 <span className="font-semibold">
                   {numPulls || "[Enter Pulls]"}
                 </span>{" "}
@@ -134,7 +199,7 @@ export default function CalculatorPage() {
         </Card>
 
         {/* Chart Card */}
-        <PullChart chartData={chartData} />
+        <PullChart chartData={chartData} milestoneLabels={milestoneLabels} />
 
         {/* Probability Table Card
         TODO: REFACTOR!!!!! */}
@@ -153,32 +218,41 @@ export default function CalculatorPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(tableData).map(
-                    ([constellation, probability], index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-border last:border-0"
-                      >
-                        <td className="p-4 text-lg font-medium">
-                          {constellation}
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-1 h-12 bg-gray-700 rounded-md overflow-hidden">
-                              <div
-                                className="h-full bg-secondary flex items-center justify-center text-white font-semibold text-lg relative"
-                                style={{ width: `${probability}%` }}
-                              >
-                                <span className="absolute left-4">
-                                  {Number(probability).toFixed(2)}%
-                                </span>
+                  {Object.entries(tableData)
+                    .sort(([keyA], [keyB]) => {
+                      // Sort so "None" comes first, then others in order
+                      if (keyA === "None") return -1;
+                      if (keyB === "None") return 1;
+                      return 0;
+                    })
+                    .map(([constellation, probability], index) => {
+                      // Get the label for this constellation key directly from the mapping
+                      const label =
+                        milestoneLabels[constellation] || constellation;
+
+                      return (
+                        <tr
+                          key={index}
+                          className="border-b border-border last:border-0"
+                        >
+                          <td className="p-4 text-lg font-medium">{label}</td>
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1 h-12 bg-gray-700 rounded-md overflow-hidden">
+                                <div
+                                  className="h-full bg-secondary flex items-center justify-center text-white font-semibold text-lg relative"
+                                  style={{ width: `${probability}%` }}
+                                >
+                                  <span className="absolute left-4">
+                                    {Number(probability).toFixed(2)}%
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
