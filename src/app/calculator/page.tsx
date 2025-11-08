@@ -49,7 +49,7 @@ export default function CalculatorPage() {
 
     const calculatedRates = getExactFeaturedRates(
       Number(target.slice(1)) + 1 - calculatedOffset,
-      slot1.type
+      slot1.type.charAt(0)
     );
     setRates(calculatedRates);
 

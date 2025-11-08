@@ -1,25 +1,39 @@
 // --- Constants ---
-const MAX_PULLS = 1200; // Max pulls to track
+const MAX_PULLS = 5000;
 const HARD_PITY = 90;
+const WEAPON_HARD_PITY = 80;
 const SOFT_PITY_START = 74;
+const WEAPON_SOFT_PITY_START = 64;
 const BASE_RATE = 0.006;
 const GUARANTEED_RATE = 1.0;
 
 // --- Pre-computed Pity Rates ---
-const pityRatePerPull: number[] = new Array(HARD_PITY + 1).fill(0);
-const softPityIncrement =
-  (GUARANTEED_RATE - BASE_RATE) / (HARD_PITY - (SOFT_PITY_START - 1));
+/**
+ * Computes pity rates for a given hard pity and soft pity start.
+ */
+function computePityRates(hardPity: number, softPityStart: number): number[] {
+  const rates: number[] = new Array(hardPity + 1).fill(0);
+  const softPityIncrement =
+    (GUARANTEED_RATE - BASE_RATE) / (hardPity - (softPityStart - 1));
 
-for (let i = 1; i <= HARD_PITY; i++) {
-  if (i < SOFT_PITY_START) {
-    pityRatePerPull[i] = BASE_RATE;
-  } else if (i < HARD_PITY) {
-    pityRatePerPull[i] =
-      BASE_RATE + (i - (SOFT_PITY_START - 1)) * softPityIncrement;
-  } else {
-    pityRatePerPull[i] = GUARANTEED_RATE;
+  for (let i = 1; i <= hardPity; i++) {
+    if (i < softPityStart) {
+      rates[i] = BASE_RATE;
+    } else if (i < hardPity) {
+      rates[i] = BASE_RATE + (i - (softPityStart - 1)) * softPityIncrement;
+    } else {
+      rates[i] = GUARANTEED_RATE;
+    }
   }
+
+  return rates;
 }
+
+const pityRatePerPull: number[] = computePityRates(HARD_PITY, SOFT_PITY_START);
+const weaponPityRatePerPull: number[] = computePityRates(
+  WEAPON_HARD_PITY,
+  WEAPON_SOFT_PITY_START
+);
 
 /**
  * Creates a 3D array initialized with zeros.
@@ -37,15 +51,16 @@ function create3DArray(d1: number, d2: number, d3: number): number[][][] {
 /**
  * Calculates the probability of having EXACTLY 'N' featured 5-stars after 'i' pulls.
  * @param maxN The maximum number of featured 5-stars to track (1-7 inclusive).
+ * @param pullString A string representing the pull plan (e.g., "C3W2C1" for 3 character copies, 2 weapon copies, 1 character copy).
  * @returns An array of objects with pulls and constellation probabilities (c0, c1, etc.)
  */
 export function getExactFeaturedRates(
   maxN: number,
-  rewardType: SlotType
+  pullString: string
 ): Array<Record<string, string | number>> {
-  if (maxN < 1 || maxN > 7) {
-    throw new Error("maxN must be between 1 and 7 inclusive");
-  }
+  // if (maxN < 1 || maxN > 7) {
+  //   throw new Error("maxN must be between 1 and 7 inclusive");
+  // }
 
   // dp[k][pity][state]: Probability of having k copies, at 'pity', on 'state' after pull (i-1).
   // Note: k goes from 0 up to maxN.
@@ -69,7 +84,11 @@ export function getExactFeaturedRates(
     for (let k = 0; k <= maxN; k++) {
       for (let pity = 0; pity < HARD_PITY; pity++) {
         const nextPity = pity + 1;
-        const pullRate = pityRatePerPull[nextPity]; // Use pre-computed rates
+        let pullRate;
+
+        // Replace 0 with 2 * k later
+        if (pullString.charAt(0) === "C") pullRate = pityRatePerPull[nextPity];
+        else pullRate = weaponPityRatePerPull[nextPity];
         const noPullRate = 1.0 - pullRate;
 
         // --- 1. Transition from 50/50 (state 0) ---
@@ -140,12 +159,12 @@ export function getExactFeaturedRates(
 
     // Add c0 through c(maxN-2) with exact probabilities for N=1 through N=maxN-1, as a percentage
     for (let n = 1; n < maxN; n++) {
-      const cKey = `${rewardType === "Character" ? "c" : "r"}${n - 1}`;
+      const cKey = `${pullString.charAt(0) === "C" ? "c" : "r"}${n - 1}`;
       entry[cKey] = results[i][n] * 100;
     }
 
     // Add the last constellation with N >= maxN, as a percentage
-    const lastCKey = `${rewardType === "Character" ? "c" : "r"}${maxN - 1}`;
+    const lastCKey = `${pullString.charAt(0) === "C" ? "c" : "r"}${maxN - 1}`;
     let probNPlus = 0;
     for (let n = maxN; n <= maxN; n++) {
       probNPlus += results[i][n];
