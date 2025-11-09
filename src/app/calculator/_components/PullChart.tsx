@@ -118,7 +118,7 @@ export default function PullChart({
                 className="text-muted-foreground"
               />
               <ChartTooltip
-                content={<ChartTooltipContent className="rounded-sm" />}
+                content={<ChartTooltipContent className="rounded-2xl p-3" />}
               />
               {Object.keys(chartData[0]).map(key => {
                 if (key === "pulls") return null;

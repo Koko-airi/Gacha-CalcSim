@@ -23,6 +23,7 @@ export default function CalculatorPage() {
    */
 
   const pullPlanState = usePullPlan();
+  const slots = pullPlanState[0];
 
   const [numPulls, setNumPulls] = useState("10");
   const [chartData, setChartData] = useState<Record<string, string | number>[]>(
@@ -40,8 +41,6 @@ export default function CalculatorPage() {
 
   // Recalculate rates when pull plan changes
   useEffect(() => {
-    const slots = pullPlanState[0];
-
     // Build pull string and calculate total copies needed
     let pullString = "";
     let totalCopiesNeeded = 0;
@@ -66,7 +65,7 @@ export default function CalculatorPage() {
 
       // Calculate how many copies needed for this slot
       let currentLevel = current === "None" ? 0 : Number(current.slice(1)) + 1;
-      let targetLevel = Number(target.slice(1)) + 1;
+      const targetLevel = Number(target.slice(1)) + 1;
 
       // Weapons start at r1, not r0
       if (slot.type === "Weapon" && current === "None") {
@@ -125,7 +124,7 @@ export default function CalculatorPage() {
       calculatedOffset
     );
     setTableData(tableResults);
-  }, [pullPlanState[0]]);
+  }, [slots]);
 
   // Update table data when numPulls changes
   useEffect(() => {

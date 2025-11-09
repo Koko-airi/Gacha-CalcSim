@@ -182,7 +182,7 @@ function ChartTooltipContent({
       )}
     >
       {!nestLabel ? tooltipLabel : null}
-      <div className="grid gap-1.5">
+      <div className="flex flex-col-reverse gap-1.5">
         {payload
           .filter(item => item.type !== "none")
           .map((item, index) => {
@@ -239,7 +239,7 @@ function ChartTooltipContent({
                         </span>
                       </div>
                       {item.value && (
-                        <span className="text-foreground font-medium tabular-nums">
+                        <span className="text-foreground font-medium tabular-nums pl-3">
                           {Number(item.value.toLocaleString()).toFixed(2) + "%"}
                         </span>
                       )}
@@ -276,7 +276,7 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        "flex flex-row-reverse items-center justify-center gap-4",
+        "flex flex-row-reverse flex-wrap items-center justify-center gap-4",
         verticalAlign === "top" ? "pb-3" : "pt-3",
         className
       )}
