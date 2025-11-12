@@ -1,26 +1,31 @@
 // --- Constants ---
 const MAX_PULLS = 5000;
-const HARD_PITY = 90;
-const WEAPON_HARD_PITY = 80;
-const SOFT_PITY_START = 74;
-const WEAPON_SOFT_PITY_START = 64;
-const BASE_RATE = 0.006;
+const CHARACTER_HARD_PITY = 90;
+const WEAPON_HARD_PITY = 77;
+const CHARACTER_SOFT_PITY_START = 74;
+const WEAPON_SOFT_PITY_START = 63;
+const CHARACTER_BASE_RATE = 0.006;
+const WEAPON_BASE_RATE = 0.007;
 const GUARANTEED_RATE = 1.0;
 
 // --- Pre-computed Pity Rates ---
 /**
  * Computes pity rates for a given hard pity and soft pity start.
  */
-function computePityRates(hardPity: number, softPityStart: number): number[] {
+function computePityRates(
+  hardPity: number,
+  softPityStart: number,
+  baseRate: number
+): number[] {
   const rates: number[] = new Array(hardPity + 1).fill(0);
   const softPityIncrement =
-    (GUARANTEED_RATE - BASE_RATE) / (hardPity - (softPityStart - 1));
+    (GUARANTEED_RATE - baseRate) / (hardPity - (softPityStart - 1));
 
   for (let i = 1; i <= hardPity; i++) {
     if (i < softPityStart) {
-      rates[i] = BASE_RATE;
+      rates[i] = baseRate;
     } else if (i < hardPity) {
-      rates[i] = BASE_RATE + (i - (softPityStart - 1)) * softPityIncrement;
+      rates[i] = baseRate + (i - (softPityStart - 1)) * softPityIncrement;
     } else {
       rates[i] = GUARANTEED_RATE;
     }
@@ -29,10 +34,15 @@ function computePityRates(hardPity: number, softPityStart: number): number[] {
   return rates;
 }
 
-const pityRatePerPull: number[] = computePityRates(HARD_PITY, SOFT_PITY_START);
+const pityRatePerPull: number[] = computePityRates(
+  CHARACTER_HARD_PITY,
+  CHARACTER_SOFT_PITY_START,
+  CHARACTER_BASE_RATE
+);
 const weaponPityRatePerPull: number[] = computePityRates(
   WEAPON_HARD_PITY,
-  WEAPON_SOFT_PITY_START
+  WEAPON_SOFT_PITY_START,
+  WEAPON_BASE_RATE
 );
 
 /**
@@ -65,7 +75,7 @@ export function getExactFeaturedRates(
   // dp[k][pity][state]: Probability of having k copies, at 'pity', on 'state' after pull (i-1).
   // Note: k goes from 0 up to maxN.
   // state: 0 for 50/50, 1 for guarantee.
-  let dp: number[][][] = create3DArray(maxN + 1, HARD_PITY + 1, 2);
+  let dp: number[][][] = create3DArray(maxN + 1, CHARACTER_HARD_PITY + 1, 2);
 
   // results[i][j]: P(exactly j copies after i pulls)
   const results: number[][] = Array.from({ length: MAX_PULLS + 1 }, () =>
@@ -78,11 +88,15 @@ export function getExactFeaturedRates(
 
   // Iterate for each pull i from 1 to MAX_PULLS
   for (let i = 1; i <= MAX_PULLS; i++) {
-    const next_dp: number[][][] = create3DArray(maxN + 1, HARD_PITY + 1, 2);
+    const next_dp: number[][][] = create3DArray(
+      maxN + 1,
+      CHARACTER_HARD_PITY + 1,
+      2
+    );
 
     // Iterate through all current states (k, pity, state) from the previous pull (i-1)
     for (let k = 0; k <= maxN; k++) {
-      for (let pity = 0; pity < HARD_PITY; pity++) {
+      for (let pity = 0; pity < CHARACTER_HARD_PITY; pity++) {
         const nextPity = pity + 1;
         let pullRate;
 
@@ -127,7 +141,7 @@ export function getExactFeaturedRates(
     // Sum up the probabilities for each 'k' to get the total chance of having EXACTLY k copies after i pulls.
     for (let j = 0; j <= maxN; j++) {
       let totalProb = 0.0;
-      for (let p = 0; p <= HARD_PITY; p++) {
+      for (let p = 0; p <= CHARACTER_HARD_PITY; p++) {
         totalProb += dp[j][p][0]; // Sum 50/50 states
         totalProb += dp[j][p][1]; // Sum Guarantee states
       }
