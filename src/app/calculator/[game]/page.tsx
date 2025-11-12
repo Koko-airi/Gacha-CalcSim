@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { figtree } from "@/lib/fonts";
-import PullPlan from "./_components/PullPlan";
-import PullChart from "./_components/PullChart";
+import PullPlan from "../_components/PullPlan";
+import PullChart from "../_components/PullChart";
 import usePullPlan from "@/hooks/usePullPlan";
 import {
   findProbabilityForPullCount,
@@ -15,15 +15,19 @@ import {
   parseRatesForGraph,
 } from "@/lib/algorithms/calculator";
 
-export default function CalculatorPage() {
+export default function CalculatorPage({
+  params,
+}: {
+  params: Promise<{ game: string }>;
+}) {
   /* We import the pull plan state from the custom hook here.
    * This will give us access to the current pull plan slots.
    * We need this to make calculations for the graph and table,
    * hence why we import here instead of in the PullPlan component.
    */
-
   const pullPlanState = usePullPlan();
   const slots = pullPlanState[0];
+  const { game } = use(params);
 
   const [numPulls, setNumPulls] = useState("10");
   const [chartData, setChartData] = useState<Record<string, string | number>[]>(
@@ -148,7 +152,12 @@ export default function CalculatorPage() {
           <h1
             className={`text-4xl font-semibold drop-shadow-emerald-600 drop-shadow-xs text-emerald-200 ${figtree.className} text-center`}
           >
-            Gacha Calculator
+            {game === "genshin"
+              ? "Genshin Impact"
+              : game === "hsr"
+              ? "Honkai Star Rail"
+              : "Zenless Zone Zero"}{" "}
+            Calculator
           </h1>
         </div>
 
