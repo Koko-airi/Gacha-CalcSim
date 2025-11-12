@@ -9,6 +9,7 @@ interface PullSlot {
   target: CharacterTarget | WeaponTarget;
 }
 
+type GameType = "genshin" | "hsr" | "zzz";
 type SlotType = "Character" | "Weapon";
 
 type CharacterCurrent = "None" | "c0" | "c1" | "c2" | "c3" | "c4" | "c5";

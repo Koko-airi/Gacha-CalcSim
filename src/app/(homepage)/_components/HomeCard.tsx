@@ -14,7 +14,7 @@ import { Calculator, ToolCase } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function HomeCard() {
-  const [game, setGame] = useState<string>("");
+  const [game, setGame] = useState<GameType | "">("");
   const router = useRouter();
 
   return (
@@ -23,7 +23,10 @@ export default function HomeCard() {
         <label className="text-sm font-medium text-foreground">
           Select Game
         </label>
-        <Select value={game} onValueChange={setGame}>
+        <Select
+          value={game}
+          onValueChange={(value: string) => setGame(value as GameType)}
+        >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Choose a game..." />
           </SelectTrigger>
@@ -38,11 +41,11 @@ export default function HomeCard() {
         <Button
           size="lg"
           className={`w-full h-12 text-lg gap-2 bg-primary hover:bg-primary/90 font-medium ${
-            game && "cursor-pointer"
+            game != "" && "cursor-pointer"
           }`}
           disabled={!game}
           onClick={() => {
-            if (game) router.push(`/calculator/${game}`);
+            if (game != "") router.push(`/calculator/${game}`);
           }}
         >
           <Calculator className="size-5" />
@@ -52,11 +55,11 @@ export default function HomeCard() {
           size="lg"
           variant="secondary"
           className={`w-full h-12 text-lg gap-2 bg-secondary hover:bg-secondary/90 font-medium ${
-            game && "cursor-pointer"
+            game != "" && "cursor-pointer"
           }`}
           disabled={!game}
           onClick={() => {
-            if (game) router.push(`/simulator/${game}`);
+            if (game != "") router.push(`/simulator/${game}`);
           }}
         >
           <ToolCase className="size-5" />

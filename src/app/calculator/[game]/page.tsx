@@ -18,7 +18,7 @@ import {
 export default function CalculatorPage({
   params,
 }: {
-  params: Promise<{ game: string }>;
+  params: Promise<{ game: GameType }>;
 }) {
   /* We import the pull plan state from the custom hook here.
    * This will give us access to the current pull plan slots.
@@ -115,7 +115,8 @@ export default function CalculatorPage({
 
     const calculatedRates = getExactFeaturedRates(
       totalCopiesNeeded,
-      pullString
+      pullString,
+      game
     );
     setRates(calculatedRates);
 
