@@ -12,6 +12,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Calculator, ToolCase } from "lucide-react";
 import { useRouter } from "next/navigation";
+import transition from "@/lib/transition";
 
 export default function HomeCard() {
   const [game, setGame] = useState<GameType | "">("");
@@ -45,7 +46,8 @@ export default function HomeCard() {
           }`}
           disabled={!game}
           onClick={() => {
-            if (game != "") router.push(`/calculator/${game}`);
+            if (game != "")
+              transition(router, `/calculator/${game}`, "home-page");
           }}
         >
           <Calculator className="size-5" />
@@ -59,7 +61,8 @@ export default function HomeCard() {
           }`}
           disabled={!game}
           onClick={() => {
-            if (game != "") router.push(`/simulator/${game}`);
+            if (game != "")
+              transition(router, `/simulator/${game}`, "homepage");
           }}
         >
           <ToolCase className="size-5" />
