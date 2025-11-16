@@ -62,7 +62,7 @@ export default function HomeCard() {
           disabled={!game}
           onClick={() => {
             if (game != "")
-              transition(router, `/simulator/${game}`, "homepage");
+              transition(router, `/simulator/${game}`, "home-page");
           }}
         >
           <ToolCase className="size-5" />
