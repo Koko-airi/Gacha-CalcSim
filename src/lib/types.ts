@@ -16,3 +16,9 @@ type CharacterCurrent = "None" | "c0" | "c1" | "c2" | "c3" | "c4" | "c5";
 type CharacterTarget = "c0" | "c1" | "c2" | "c3" | "c4" | "c5" | "c6";
 type WeaponCurrent = "None" | "r1" | "r2" | "r3" | "r4";
 type WeaponTarget = "r1" | "r2" | "r3" | "r4" | "r5";
+
+type RewardItem = {
+  name: string;
+  type: "character" | "weapon";
+  rarity: number;
+};
