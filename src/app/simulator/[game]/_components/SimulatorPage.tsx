@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useTransition, useState } from "react";
+import { useTransition, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Dices, Loader2 } from "lucide-react";
 import { figtree } from "@/lib/fonts";
@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import simulatePulls, { SimulationType } from "@/actions/simulatePulls";
+import ResultDialog from "./ResultDialog";
 
 export default function SimulatorPage({
   game,
@@ -42,6 +43,11 @@ export default function SimulatorPage({
   return (
     <div className="min-h-screen p-4 py-8 md:p-8 fade-in" id="calculator-page">
       <div className="max-w-6xl mx-auto space-y-6">
+        <ResultDialog
+          pullResults={pullResults}
+          clearResults={() => setPullResults([])}
+        />
+
         {/* Header */}
         <div className="relative">
           <button
@@ -390,7 +396,13 @@ export default function SimulatorPage({
               })
             }
             className="h-16 text-lg gap-2 bg-primary hover:bg-primary/90"
-            disabled={isLoading}
+            disabled={
+              isLoading ||
+              (promoState.bannerType === "character"
+                ? promoState.featured4Star3 == ""
+                : promoState.bannerType === "weapon" &&
+                  promoState.featured4Star4 == "")
+            }
           >
             <Dices className="size-5" />
             Pull ×1
@@ -403,7 +415,13 @@ export default function SimulatorPage({
               })
             }
             className="h-16 text-lg gap-2 bg-secondary hover:bg-secondary/90"
-            disabled={isLoading}
+            disabled={
+              isLoading ||
+              (promoState.bannerType === "character"
+                ? promoState.featured4Star3 == ""
+                : promoState.bannerType === "weapon" &&
+                  promoState.featured4Star4 == "")
+            }
           >
             <Dices className="size-5" />
             Pull ×10
