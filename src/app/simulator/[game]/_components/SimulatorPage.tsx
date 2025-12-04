@@ -39,7 +39,7 @@ export default function SimulatorPage({
   const [pullResults, setPullResults] = useState<RewardItem[]>([]);
 
   return (
-    <div className="min-h-screen p-4 py-8 md:p-8 fade-in" id="calculator-page">
+    <div className="min-h-screen p-4 py-8 md:p-8 fade-in" id="simulator-page">
       <div className="max-w-6xl mx-auto space-y-6">
         <ResultDialog
           pullResults={pullResults}
@@ -48,7 +48,7 @@ export default function SimulatorPage({
 
         {/* Header */}
         <div className="relative">
-          <ReturnHome />
+          <ReturnHome componentId="simulator-page" />
           <h1
             className={`text-4xl font-semibold drop-shadow-emerald-600 drop-shadow-xs text-emerald-200 ${figtree.className} text-center`}
           >

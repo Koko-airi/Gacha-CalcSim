@@ -143,7 +143,7 @@ export default function CalculatorPage({
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="relative">
-          <ReturnHome />
+          <ReturnHome componentId="calculator-page" />
           <h1
             className={`text-4xl font-semibold drop-shadow-emerald-600 drop-shadow-xs text-emerald-200 ${figtree.className} text-center`}
           >

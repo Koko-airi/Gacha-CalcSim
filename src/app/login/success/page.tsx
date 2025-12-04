@@ -9,11 +9,11 @@ import ReturnHome from "@/components/ReturnHome";
 
 export default function LoginSuccessPage() {
   return (
-    <div className="min-h-screen p-4 py-8 md:p-8 fade-in" id="calculator-page">
+    <div className="min-h-screen p-4 py-8 md:p-8 fade-in" id="login-success">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="relative">
-          <ReturnHome />
+          <ReturnHome componentId="login-success" />
           <h1
             className={`text-4xl font-semibold drop-shadow-emerald-600 drop-shadow-xs text-emerald-200 ${figtree.className} text-center`}
           >
