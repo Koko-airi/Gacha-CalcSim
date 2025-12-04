@@ -20,7 +20,14 @@ export default function HomePage() {
         </div>
         <HomeCard />
         <p className="text-center text-gray-300 drop-shadow-xs text-sm">
-          Created by Null Pointer Exception
+          Created by{" "}
+          <a
+            href="https://github.com/Koko-airi/Gacha-CalcSim/"
+            className="text-blue-300 font-medium hover:underline"
+            target="_blank"
+          >
+            Null Pointer Exception
+          </a>
         </p>
       </div>
     </div>
