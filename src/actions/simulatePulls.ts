@@ -1,6 +1,7 @@
 "use server";
 
 import { PullResult, runSimulation } from "@/lib/algorithms/simulator";
+import { fetchRewards } from "@/lib/rewards";
 import { createClient } from "@/utils/supabase/server";
 
 type CharacterSimulation = {
@@ -21,7 +22,7 @@ type WeaponSimulation = {
   bannerType: "weapon";
 };
 
-type SimulationType = CharacterSimulation | WeaponSimulation;
+export type SimulationType = CharacterSimulation | WeaponSimulation;
 
 /**
  * Server action to run the pull simulation.
@@ -35,8 +36,8 @@ export default async function simulatePulls(
   game: GameType,
   type: SimulationType
 ) {
-  const supabase = await createClient();
   const pullResults = runSimulation(pulls, game, type.bannerType);
+  const supabase = await createClient();
 
   // Fetch all rewards for this game once
   const { data: allRewards } = await supabase
@@ -46,13 +47,17 @@ export default async function simulatePulls(
 
   if (!allRewards) return [];
 
+  let rewardsByName, rewardsByRarity;
+
   // Lookup maps for O(1) access
-  const rewardsByName = new Map(allRewards.map(r => [r.name, r]));
-  const rewardsByRarity = {
-    5: allRewards.filter(r => r.rarity === 5),
-    4: allRewards.filter(r => r.rarity === 4),
-    3: allRewards.filter(r => r.rarity === 3),
-  };
+  try {
+    const res = await fetchRewards(game);
+    rewardsByName = res.rewardsByName;
+    rewardsByRarity = res.rewardsByRarity;
+  } catch (error) {
+    console.warn("Failed to fetch rewards:", error);
+    return [];
+  }
 
   // Helper to get random reward by rarity
   const getRandomReward = (rarity: number) => {
