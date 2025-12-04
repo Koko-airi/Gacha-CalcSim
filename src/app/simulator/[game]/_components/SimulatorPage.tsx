@@ -2,10 +2,8 @@
 
 import { useTransition, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Dices, Loader2 } from "lucide-react";
+import { Dices, Loader2 } from "lucide-react";
 import { figtree } from "@/lib/fonts";
-import { useRouter } from "next/navigation";
-import transition from "@/lib/transition";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -18,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import simulatePulls, { SimulationType } from "@/actions/simulatePulls";
 import ResultDialog from "./ResultDialog";
+import ReturnHome from "@/components/ReturnHome";
 
 export default function SimulatorPage({
   game,
@@ -29,7 +28,6 @@ export default function SimulatorPage({
     five: { character: string[]; weapon: string[] };
   };
 }) {
-  const router = useRouter();
   const [isLoading, startTransition] = useTransition();
   const [promoState, setPromoState] = useState<SimulationType>({
     promo5Star: "",
@@ -50,12 +48,7 @@ export default function SimulatorPage({
 
         {/* Header */}
         <div className="relative">
-          <button
-            onClick={() => transition(router, "/", "calculator-page")}
-            className="hover:bg-transparent cursor-pointer text-gray-100 drop-shadow-sm drop-shadow-gray-200/40 absolute z-20 top-2 transition-transform duration-200 hover:scale-105"
-          >
-            <ArrowLeft className="size-6" />
-          </button>
+          <ReturnHome />
           <h1
             className={`text-4xl font-semibold drop-shadow-emerald-600 drop-shadow-xs text-emerald-200 ${figtree.className} text-center`}
           >

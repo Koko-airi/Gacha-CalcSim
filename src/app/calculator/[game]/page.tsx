@@ -3,7 +3,6 @@
 import { use, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
 import { figtree } from "@/lib/fonts";
 import PullPlan from "../_components/PullPlan";
 import PullChart from "../_components/PullChart";
@@ -13,8 +12,7 @@ import {
   getExactFeaturedRates,
   parseRatesForGraph,
 } from "@/lib/algorithms/calculator";
-import { useRouter } from "next/navigation";
-import transition from "@/lib/transition";
+import ReturnHome from "@/components/ReturnHome";
 
 export default function CalculatorPage({
   params,
@@ -29,7 +27,6 @@ export default function CalculatorPage({
   const pullPlanState = usePullPlan();
   const slots = pullPlanState[0];
   const { game } = use(params);
-  const router = useRouter();
 
   const [numPulls, setNumPulls] = useState("10");
   const [chartData, setChartData] = useState<Record<string, string | number>[]>(
@@ -146,12 +143,7 @@ export default function CalculatorPage({
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="relative">
-          <button
-            onClick={() => transition(router, "/", "calculator-page")}
-            className="hover:bg-transparent cursor-pointer text-gray-100 drop-shadow-sm drop-shadow-gray-200/40 absolute z-20 top-2 transition-transform duration-200 hover:scale-105"
-          >
-            <ArrowLeft className="size-6" />
-          </button>
+          <ReturnHome />
           <h1
             className={`text-4xl font-semibold drop-shadow-emerald-600 drop-shadow-xs text-emerald-200 ${figtree.className} text-center`}
           >

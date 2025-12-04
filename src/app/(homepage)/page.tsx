@@ -1,13 +1,31 @@
+"use client";
+
 import { figtree } from "@/lib/fonts";
 import HomeCard from "./_components/HomeCard";
+import { Button } from "@/components/ui/button";
+import { LogIn } from "lucide-react";
+import { useRouter } from "next/navigation";
+import transition from "@/lib/transition";
 
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-6 fade-in"
       id="home-page"
     >
       <div className="w-full max-w-2xl space-y-8">
+        <Button
+          variant="secondary"
+          className="absolute font-semibold text-white top-4 right-4 cursor-pointer drop-shadow-emerald-700 drop-shadow-xs"
+          onClick={() => {
+            transition(router, `/login`, "home-page");
+          }}
+        >
+          <LogIn />
+          Sign in to save your pulls!
+        </Button>
         <div className="text-center space-y-3">
           <h1
             className={`text-5xl font-semibold drop-shadow-emerald-700 drop-shadow-xs text-emerald-300 ${figtree.className}`}
