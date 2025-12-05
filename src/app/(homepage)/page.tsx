@@ -1,14 +1,15 @@
-"use client";
-
 import { figtree } from "@/lib/fonts";
 import HomeCard from "./_components/HomeCard";
-import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
-import { useRouter } from "next/navigation";
-import transition from "@/lib/transition";
+import TransitionLogin from "./_components/TransitionLogin";
+import { createClient } from "@/utils/supabase/server";
+import SignOut from "./_components/SignOut";
 
-export default function HomePage() {
-  const router = useRouter();
+export default async function HomePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  console.log(user);
 
   return (
     <div
@@ -16,16 +17,7 @@ export default function HomePage() {
       id="home-page"
     >
       <div className="w-full max-w-2xl space-y-8">
-        <Button
-          variant="secondary"
-          className="absolute font-semibold text-white top-4 right-4 cursor-pointer drop-shadow-emerald-700 drop-shadow-xs"
-          onClick={() => {
-            transition(router, `/login`, "home-page");
-          }}
-        >
-          <LogIn />
-          Sign in to save your pulls!
-        </Button>
+        {user == null ? <TransitionLogin /> : <SignOut />}
         <div className="text-center space-y-3">
           <h1
             className={`text-5xl font-semibold drop-shadow-emerald-700 drop-shadow-xs text-emerald-300 ${figtree.className}`}
