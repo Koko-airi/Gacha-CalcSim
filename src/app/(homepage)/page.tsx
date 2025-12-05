@@ -9,7 +9,6 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  console.log(user);
 
   return (
     <div
